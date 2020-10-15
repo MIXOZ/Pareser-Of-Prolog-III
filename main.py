@@ -57,7 +57,8 @@ class PrologParser(TextParsers, whitespace=r'[ \t\n]*'):
     trie_types = lambda x: '' if ','.join(list(map(lambda y: str(y), x))) == '' else ''.join(
         ["TYPES(", ','.join(list(map(lambda y: str(y), x))), ")\n"])
     trie_type_short = lambda x: 'type(' + x[0] + ',' + x[2] + ')'
-    trie_type_long = lambda x: 'Typedef ' + x[1] + ' (' + x[2] + ')'
+    trie_type_long = lambda x: 'Typedef ' + x[1] + ' (' + x[2] +
+    trie_program_final = lambda x: '\n'.join(x)
 
     definition = fwd()
     identifier = fwd()
@@ -114,7 +115,7 @@ class PrologParser(TextParsers, whitespace=r'[ \t\n]*'):
 
     module.define(((MOD & identifier & TAIL) > trie_module) > trie_modules)
 
-    program.define(((opt(module)) & (opt(type)) & (opt(rep(definition) > (lambda x: '\n'.join(x))))) > trie_program)
+    program.define(((opt(module)) & (opt(type)) & (opt(rep(definition) > trie_program_final))) > trie_program)
 
     # t_atom.define((TYPEID & (rep(((LBR & t_subatom & RBR) > trie_atom) | t_subsubatom) > trie_atom)) > trie_atom_last)
     #
