@@ -57,7 +57,7 @@ class PrologParser(TextParsers, whitespace=r'[ \t\n]*'):
     trie_types = lambda x: '' if ','.join(list(map(lambda y: str(y), x))) == '' else ''.join(
         ["TYPES(", ','.join(list(map(lambda y: str(y), x))), ")\n"])
     trie_type_short = lambda x: 'type(' + x[0] + ',' + x[2] + ')'
-    trie_type_long = lambda x: 'Typedef ' + x[1] + ' (' + x[2] +
+    trie_type_long = lambda x: 'Typedef ' + x[1] + ' (' + x[2] + ')'
     trie_program_final = lambda x: '\n'.join(x)
 
     definition = fwd()
