@@ -80,6 +80,7 @@ class PrologParser(TextParsers, whitespace=r'[ \t\n]*'):
     typeid = fwd()
     mlist = fwd()
     sublist = fwd()
+    ident_atom = fwd()
 
     sublist.define(repsep(atom | var | mlist, AND) > trie_list)
 
@@ -96,13 +97,15 @@ class PrologParser(TextParsers, whitespace=r'[ \t\n]*'):
     typeid.define((pred(TYPEID, trie_allow_word, '')) > trie_nothing)
 
     atom.define((identifier & (
-            rep(((LBR & subatom & RBR) > trie_atom_nothing) | subsubatom) > trie_atom_nothing)) > trie_atom_last)
+            rep(((LBR & (identifier | ident_atom) & RBR) > trie_get_fst) | ((LBR & subatom & RBR) > trie_atom_nothing) | subsubatom) > trie_atom_nothing)) > trie_atom_last)
 
     subatom.define((atom > trie_atom_nothing) |
-                   (((LBR & (var | subatom | mlist) & RBR) > trie_get_fst) > trie_atom_nothing))
+                   (((LBR & (identifier | var | subatom | mlist ) & RBR) > trie_get_fst) > trie_atom_nothing))
 
     subsubatom.define((atom > trie_atom_nothing) |
                       (((identifier | var | mlist) & (rep(subsubatom) > trie_atom_nothing)) > trie_atom_nothing))
+
+    ident_atom.define(identifier | var | ((LBR & ident_atom & RBR) > trie_get_fst))
 
     block.define((((LBR & disjunction & RBR) > trie_get_fst) |
                   atom) > trie_nothing)
@@ -135,7 +138,7 @@ class PrologParser(TextParsers, whitespace=r'[ \t\n]*'):
 
 
 if __name__ == '__main__':
-    filename = sys.argv[1]
+    filename = sys.argv[2]
     with open(filename, 'r') as file:
         string = file.read()
 
@@ -143,19 +146,19 @@ if __name__ == '__main__':
         print(f'use next flags:\n--atom\n--typeexpr\n'
               f'--type\n--module\n--relation\n--list\n--prog\n')
         sys.exit()
-    if sys.argv[2] == '--atom':
+    if sys.argv[1] == '--atom':
         tmp = PrologParser.atom.parse(string)
-    elif sys.argv[2] == '--typeexpr':
+    elif sys.argv[1] == '--typeexpr':
         tmp = PrologParser.type_atom2.parse(string)
-    elif sys.argv[2] == '--type':
+    elif sys.argv[1] == '--type':
         tmp = PrologParser.type.parse(string)
-    elif sys.argv[2] == '--module':
+    elif sys.argv[1] == '--module':
         tmp = PrologParser.module.parse(string)
-    elif sys.argv[2] == '--relation':
+    elif sys.argv[1] == '--relation':
         tmp = PrologParser.definition.parse(string)
-    elif sys.argv[2] == '--list':
+    elif sys.argv[1] == '--list':
         tmp = PrologParser.mlist.parse(string)
-    elif sys.argv[2] == '--prog':
+    elif sys.argv[1] == '--prog':
         tmp = PrologParser.program.parse(string)
     else:
         print(f'use next flags:\n--atom\n--typeexpr\n'
@@ -169,12 +172,12 @@ if __name__ == '__main__':
         s = re.sub(r'\s\)', r')', s)
         s = re.sub(r',', r', ', s)
         s = re.sub(r',\s\s', r', ', s)
-        print(f'Successful, see result in {filename[0: -3]}out')
-        with open(filename[0: -3] + 'out', 'w') as file:
+        print(f'Successful, see result in {filename}.out')
+        with open(filename + '.out', 'w') as file:
             file.write(s)
     else:
-        print(f'Smth went wrong, see result in {filename[0: -3]}out')
-        with open(filename[0: -3] + 'out', 'w') as file:
+        print(f'Smth went wrong, see result in {filename}.out')
+        with open(filename + '.out', 'w') as file:
             file.write(tmp.message)
     # strings = [
     #     'type a ((((((((((((a)))->(((a)))))))))->(((((((((a)))->(((a)))))))))))).',
