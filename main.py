@@ -138,32 +138,39 @@ class PrologParser(TextParsers, whitespace=r'[ \t\n]*'):
 
 
 if __name__ == '__main__':
-    filename = sys.argv[2]
-    with open(filename, 'r') as file:
-        string = file.read()
-
-    if len(sys.argv) != 3:
+    if (len(sys.argv) != 3) and (len(sys.argv) != 2):
         print(f'use next flags:\n--atom\n--typeexpr\n'
               f'--type\n--module\n--relation\n--list\n--prog\n')
         sys.exit()
-    if sys.argv[1] == '--atom':
-        tmp = PrologParser.atom.parse(string)
-    elif sys.argv[1] == '--typeexpr':
-        tmp = PrologParser.type_atom2.parse(string)
-    elif sys.argv[1] == '--type':
-        tmp = PrologParser.type.parse(string)
-    elif sys.argv[1] == '--module':
-        tmp = PrologParser.module.parse(string)
-    elif sys.argv[1] == '--relation':
-        tmp = PrologParser.definition.parse(string)
-    elif sys.argv[1] == '--list':
-        tmp = PrologParser.mlist.parse(string)
-    elif sys.argv[1] == '--prog':
+    if len(sys.argv) == 2:
+        filename = sys.argv[1]
+        with open(filename, 'r') as file:
+            string = file.read()
         tmp = PrologParser.program.parse(string)
     else:
-        print(f'use next flags:\n--atom\n--typeexpr\n'
-              f'--type\n--module\n--relation\n--list\n--prog')
-        sys.exit()
+        filename = sys.argv[2]
+        with open(filename, 'r') as file:
+            string = file.read()
+
+
+        if sys.argv[1] == '--atom':
+            tmp = PrologParser.atom.parse(string)
+        elif sys.argv[1] == '--typeexpr':
+            tmp = PrologParser.type_atom2.parse(string)
+        elif sys.argv[1] == '--type':
+            tmp = PrologParser.type.parse(string)
+        elif sys.argv[1] == '--module':
+            tmp = PrologParser.module.parse(string)
+        elif sys.argv[1] == '--relation':
+            tmp = PrologParser.definition.parse(string)
+        elif sys.argv[1] == '--list':
+            tmp = PrologParser.mlist.parse(string)
+        elif sys.argv[1] == '--prog':
+            tmp = PrologParser.program.parse(string)
+        else:
+            print(f'use next flags:\n--atom\n--typeexpr\n'
+                  f'--type\n--module\n--relation\n--list\n--prog')
+            sys.exit()
 
     if type(tmp) == Success:
         s = tmp.value
